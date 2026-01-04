@@ -39,7 +39,7 @@ router.post(
     try {
       const imageFiles = req.files as Express.Multer.File[];
       const newHotel: HotelType = req.body;
-
+      // 1. upload the images to cloudinary
       const imageUrls = await uploadImages(imageFiles);
 
       newHotel.imageUrls = imageUrls;
@@ -112,14 +112,14 @@ router.put(
       await hotel.save();
       res.status(201).json(hotel);
     } catch (error) {
-      res.status(500).json({ message: "Something went throw" });
+      res.status(500).json({ message: "Something went wrong" });
     }
   }
 );
 
 async function uploadImages(imageFiles: Express.Multer.File[]) {
   const uploadPromises = imageFiles.map(async (image) => {
-    const b64 = Buffer.from(image.buffer).toString("base64");
+    const b64 = image.buffer.toString("base64");
     let dataURI = "data:" + image.mimetype + ";base64," + b64;
     const res = await cloudinary.v2.uploader.upload(dataURI);
     return res.url;
